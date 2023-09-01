@@ -14,13 +14,18 @@ export default function Navbar() {
               </Link>
             </div>
             <div className="px-4 hover:scale-110">
-              <Link href="/about" legacyBehavior>
+              <Link href="/schedule" legacyBehavior>
                 <a>Schedule</a>
               </Link>
             </div>
             <div className="px-4 hover:scale-110">
-              <Link href="/about" legacyBehavior>
-                <a>Invoices and Payments</a>
+              <Link href="/invoices" legacyBehavior>
+                <a>Invoices</a>
+              </Link>
+            </div>
+            <div className="px-4 hover:scale-110">
+              <Link href="/payments" legacyBehavior>
+                <a>Payments</a>
               </Link>
             </div>
           </div>

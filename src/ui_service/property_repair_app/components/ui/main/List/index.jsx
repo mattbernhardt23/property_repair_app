@@ -1,7 +1,6 @@
 import { Children } from "react";
 import { StatusButton } from "@components/ui/project";
-
-// Similar to how we created a button, we're going to need a status tag. That element will go inside the status and we'll change it the same way.
+import Link from "next/link";
 
 export default function List({ projects, children }) {
   return (
@@ -16,6 +15,7 @@ export default function List({ projects, children }) {
             <th className="py-2 px-4 text-center">Type</th>
             <th className="py-2 px-4 text-center">Schedule</th>
             <th className="py-2 px-4 text-center">Status</th>
+            {/* Add a column to add a schedule button */}
           </tr>
         </thead>
         <tbody className="text-black bg-white">
@@ -37,22 +37,26 @@ export default function List({ projects, children }) {
               .slice(-2)}`;
 
             return (
-              <tr
-                key={index}
-                className="border-t hover:bg-black hover:text-white cursor-pointer font-semibold"
-              >
-                <td className="py-2 px-4 text-center">{project.address}</td>
-                <td className="py-2 px-4 text-center">{project.city}</td>
-                <td className="py-2 px-4 text-center">{project.state}</td>
-                <td className="py-2 px-4 text-center">
-                  {project.distance_from_home.toFixed(2)} mi
-                </td>
-                <td className="py-2 px-4 text-center">{project.type}</td>
-                <td className="py-2 px-4 text-center">{formattedSchedule}</td>
-                <td className="py-2 px-4 text-center">
-                  <StatusButton status={project.status} />
-                </td>
-              </tr>
+              <Link href={`/project/${project.id}`} legacyBehavior>
+                <tr
+                  key={index}
+                  className="border-t hover:bg-black hover:text-white cursor-pointer font-semibold"
+                >
+                  <td className="py-2 px-4 text-center">{project.address}</td>
+                  <td className="py-2 px-4 text-center">{project.city}</td>
+                  <td className="py-2 px-4 text-center">{project.state}</td>
+                  <td className="py-2 px-4 text-center">
+                    {project.distance_from_home.toFixed(2)} mi
+                  </td>
+                  <td className="py-2 px-4 text-center">{project.type}</td>
+                  <td className="py-2 px-4 text-center">{formattedSchedule}</td>
+                  <td className="py-2 px-4 text-center">
+                    <StatusButton status={project.status} />
+                  </td>
+                  {/* Add a schedule button, opens a small calander and drop down
+                  with a button to Send Request */}
+                </tr>
+              </Link>
             );
           })}
         </tbody>
@@ -60,18 +64,3 @@ export default function List({ projects, children }) {
     </div>
   );
 }
-
-// export default function List({ projects, children }) {
-//   return (
-//     <>
-//       <div className={`w-full m-4 h-full`}>
-//         <div>
-//           <ListHeader />
-//         </div>
-//         <div className="overflow-y-auto bg-white rounded-b-lg">
-//           {projects.map((project) => children(project))}
-//         </div>
-//       </div>
-//     </>
-//   );
-// }
