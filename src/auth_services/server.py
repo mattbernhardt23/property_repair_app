@@ -7,160 +7,73 @@ from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
 import mysql.connector
 from dotenv import load_dotenv
-from storage import util
+from storage import util as storage_util
+from users import util as users_util
+from admin import util as admin_util
 from flask_cors import CORS
 
-app = Flask(__name__)
-
-
-load_dotenv()  # Load environment variables from .env file
 
 server = Flask(__name__)
 api = Api(server)
 # Allow requests from this origin
-CORS(server, origins='http://localhost:3000')
+CORS(server, origins=['http://localhost:3000', 'http://localhost:3001'])
 
 
-# config
-db_config = {
-    "host": os.environ.get("MYSQL_HOST"),
-    "user": os.environ.get("MYSQL_USER"),
-    "password": os.environ.get("MYSQL_PASSWORD"),
-    "database": os.environ.get("MYSQL_DB")
-}
-
-jwt_secret = os.environ.get("JWT_SECRET")
-
+# tech user routes
 
 @server.route("/register", methods=["POST"])
 def register():
-    data = request.json
-    email = data.get('email')
-    password = data.get('password')
+    response = users_util.register(request)
 
-    if not email or not password:
-        return jsonify({"message": "Username and password are required."}), 400
-
-    # Check if the username is already taken
-    try:
-        conn = mysql.connector.connect(**db_config)
-    # Rest of your database-related code
-    except mysql.connector.Error as e:
-        return ("Error connecting to the database:", e)
-
-    cursor = conn.cursor()
-
-    query = "SELECT COUNT(*) FROM users WHERE username = %s"
-    cursor.execute(query, (email,))
-    result = cursor.fetchone()[0]
-
-    cursor.close()
-    conn.close()
-
-    if result > 0:
-        return jsonify({"message": "Username already exists. Please choose a different username."}), 409
-
-    # Create a new user and store in the database
-    response = util.create_user(data)
-
-    return jsonify(response), 201
+    return response
 
 
 @server.route("/login", methods=["POST"])
 def login():
-    data = request.json
-    email = data.get('email')
-    password = data.get('password')
+    response = users_util.login(request)
 
-    if not email or not password:
-        return jsonify({"message": "Username and password are required."}), 400
-
-    try:
-        conn = mysql.connector.connect(**db_config)
-        # Rest of your database-related code
-    except mysql.connector.Error as e:
-        return jsonify({"message": "Error connecting to the database.", "error": str(e)}), 500
-
-    cursor = conn.cursor()
-
-    query = "SELECT * FROM users WHERE email = %s"
-    cursor.execute(query, (email,))
-    user = cursor.fetchone()
-
-    cursor.close()
-    conn.close()
-
-    if not user:
-        return jsonify({"message": "User not found. Please check your credentials."}), 404
-
-    stored_hashed_password = user[2]  # Assuming password is stored at index 1
-    input_hashed_password = hashlib.sha256(password.encode()).hexdigest()
-
-    if stored_hashed_password == input_hashed_password:
-        token = util.createJWT(email, jwt_secret, user[2])
-
-        user_info = {
-            "id": user[0],
-            "username": user[1],
-            "password": user[2],
-            "is_admin": user[3],
-            "phone_number": user[4],
-            "street_address": user[5],
-            "city": user[6],
-            "state": user[7],
-            "zip_code": user[8],
-            "email": user[9],
-            "latitude": user[10],
-            "longitude": user[11],
-            "token": token
-        }
-
-        return jsonify(user_info), 200
-    else:
-        return jsonify({"message": "Incorrect password. Please check your credentials."}), 401
+    return response
 
 
 @server.route("/me", methods=["POST"])
 def get_me():
-    email, status_code = util.validate(request)
+    response = users_util.get_me(request)
 
-    if status_code != 200:
-        return email
+    return response
 
-    try:
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor()
 
-        query = "SELECT * FROM users WHERE email = %s"
-        cursor.execute(query, (email,))
-        user = cursor.fetchone()
+# admin routes
 
-        cursor.close()
-        conn.close()
 
-        if not user:
-            return jsonify({"message": "User not found."}), 404
+@server.route("/admin/register", methods=["POST"])
+def admin_register():
+    response = admin_util.register(request)
 
-        user_info = {
-            "id": user[0],
-            "username": user[1],
-            "password": user[2],
-            "is_admin": user[3],
-            "phone_number": user[4],
-            "street_address": user[5],
-            "city": user[6],
-            "state": user[7],
-            "zip_code": user[8],
-            "email": user[9],
-            "latitude": user[10],
-            "longitude": user[11]
-        }
+    return response
 
-        return jsonify(user_info), 200
 
-    except Exception as e:
-        print(e)
-        return jsonify({"message": "Error retrieving user."}), 500
+@server.route("/admin/login", methods=["POST"])
+def admin_login():
+    response = admin_util.login(request)
+
+    return response
+
+
+@server.route("/admin/me", methods=["POST"])
+def admin_me():
+    response = admin_util.me(request)
+
+    return response
+
+
+@server.route("/admin/users", methods=["GET"])
+def get_users():
+    response = admin_util.get_users()
+
+    return response
+
+# deactivate admin
+# deactivate users
 
 
 if __name__ == "__main__":

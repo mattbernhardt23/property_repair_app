@@ -8,9 +8,10 @@ const API_URL = "http://127.0.0.1:5000/";
 //Register User
 const register = async (userData) => {
   const request = {
-    username: userData.name,
+    first_name: userData.first_name,
+    last_name: userData.last_name,
     password: userData.password,
-    is_admin: userData.is_admin,
+    is_admin: 0,
     phone_number: userData.phone_number,
     street_address: userData.street_address,
     city: userData.city,

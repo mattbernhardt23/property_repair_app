@@ -30,21 +30,21 @@ export default function Register() {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const { user, isLoading, isError, isSuccess, message } = useSelector(
+  const { user, isLoading, isError, isSuccess } = useSelector(
     (state) => state.auth
   );
 
-  // useEffect(() => {
-  //     if(isError) {
-  //         toast.error(message)
-  //     }
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+    }
 
-  //     if(isSuccess || user){
-  //         navigate('/')
-  //     }
+    if (isSuccess || user) {
+      navigate("/");
+    }
 
-  //     dispatch(reset())
-  // }, [user, isLoading, isError, isSuccess, message])
+    dispatch(reset());
+  }, [user, isLoading, isError, isSuccess, message]);
 
   const onChange = (e) => {
     setFormData((prevState) => ({
@@ -90,14 +90,11 @@ export default function Register() {
   return (
     <>
       <section>
-        <div className="flex flex-col items-center py-12">
+        <div className="flex flex-col items-center pt-28 py-12">
           <h1 className="py-4 text-3xl font-header">Register</h1>
           <p className="py-4 text-xl font-bold tracking-widest text-white">
             Welcome to Property Repair
           </p>
-          <div className="w-1/3 pt-2">
-            <Message type="danger">{message}</Message>
-          </div>
         </div>
       </section>
       <section>

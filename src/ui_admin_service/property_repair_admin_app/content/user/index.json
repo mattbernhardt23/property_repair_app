@@ -1,0 +1,16 @@
+[
+  {
+    "id": 12,
+    "username": "matty_b_does_construction",
+    "password": "getAtMeDawg1010",
+    "is_admin": 0,
+    "phone_number": 3038172279,
+    "street_address": "3105 N High St.",
+    "city": "Denver",
+    "state": "CO",
+    "zip_code": 80205,
+    "email": "no@email.com",
+    "longitude": -104.96503370,
+    "latitude": 39.76097750
+  }
+]

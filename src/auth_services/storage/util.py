@@ -49,15 +49,17 @@ def get_location(address):
 
 
 def create_user(data):
-    username = data.get("username")
+    first_name = data.get("first_name")
+    last_name = data.get("last_name")
     password = data.get("password")
-    is_admin = data.get("is_admin")
+    is_admin = int(data.get("is_admin"))
+    email = data.get("email")
     phone_number = data.get("phone_number")
     street_address = data.get("street_address")
     city = data.get("city")
     state = data.get("state")
     zip_code = data.get("zip_code")
-    email = data.get("email")
+    active = True
 
     # Get Geo-Location of Project Address
     full_address = street_address + '' + city + ',' + state
@@ -75,9 +77,9 @@ def create_user(data):
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
         # Insert user information into the database
-        query = "INSERT INTO users (username, password, is_admin, phone_number, street_address, city, state, zip_code, email, latitude, longitude) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        values = (username, hashed_password, is_admin, phone_number,
-                  street_address, city, state, zip_code, email, latitude, longitude)
+        query = "INSERT INTO users (first_name, last_name, password, is_admin, phone_number, street_address, city, state, zip_code, email, latitude, longitude, active) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        values = (first_name, last_name, hashed_password, is_admin, phone_number,
+                  street_address, city, state, zip_code, email, latitude, longitude, active)
         cursor.execute(query, values)
 
         conn.commit()
@@ -85,7 +87,8 @@ def create_user(data):
         conn.close()
 
         user_info = {
-            "username": username,
+            "first_name": first_name,
+            "last_name": last_name,
             "is_admin": is_admin,
             "phone_number": phone_number,
             "street_address": street_address,
@@ -107,10 +110,10 @@ def create_user(data):
         return "An error occurred while creating the user"
 
 
-def createJWT(username, secret, authz):
+def createJWT(email, secret, authz):
     return jwt.encode(
         {
-            "email": username,
+            "email": email,
             "exp": datetime.datetime.now(tz=datetime.timezone.utc)
             + datetime.timedelta(days=1),
             "iat": datetime.datetime.utcnow(),
@@ -123,7 +126,7 @@ def createJWT(username, secret, authz):
 
 def validate(data):
     encoded_jwt = data.headers.get('Authorization')
-
+    print("jwt", encoded_jwt)
     if not encoded_jwt:
         return "Missing Credentials", 401
 

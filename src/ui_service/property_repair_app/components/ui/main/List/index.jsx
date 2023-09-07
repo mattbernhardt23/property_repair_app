@@ -15,6 +15,7 @@ export default function List({ projects, children }) {
             <th className="py-2 px-4 text-center">Type</th>
             <th className="py-2 px-4 text-center">Schedule</th>
             <th className="py-2 px-4 text-center">Status</th>
+            <th className="py-2 px-4 text-center">Quote</th>
             {/* Add a column to add a schedule button */}
           </tr>
         </thead>
@@ -55,6 +56,7 @@ export default function List({ projects, children }) {
                   </td>
                   {/* Add a schedule button, opens a small calander and drop down
                   with a button to Send Request */}
+                  <td className="py-2 px-4 text-center">Quote Status</td>
                 </tr>
               </Link>
             );
