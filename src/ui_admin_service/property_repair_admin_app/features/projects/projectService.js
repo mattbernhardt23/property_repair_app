@@ -13,9 +13,17 @@ const getProject = (index) => {
   return data[index];
 };
 
+const addProject = async (data) => {
+  console.log(data);
+  const response = await axios.post(API_URL + "add", data);
+  console.log(response.data);
+  return response.data;
+};
+
 const projectService = {
   getProjects,
   getProject,
+  addProject,
 };
 
 export default projectService;

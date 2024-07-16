@@ -14,9 +14,9 @@ export default function BaseLayout({ children }) {
       </Head>
       <div className="">
         <Navbar className="" />
-        <div className="bg-gray-400 pt-40">{children}</div>
+        <div className="bg-gray-400 pt-40 pb-20">{children}</div>
+        <Footer />
       </div>
-      <Footer />
     </>
   );
 }

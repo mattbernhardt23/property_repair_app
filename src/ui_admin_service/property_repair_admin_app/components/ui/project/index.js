@@ -5,3 +5,6 @@ export { default as Message } from "./Message";
 export { default as Notes } from "./Notes";
 export { default as Photos } from "./Photos";
 export { default as Schedule } from "./Schedule";
+export { default as StatusList } from "./List/Status";
+export { default as TechList } from "./List/Tech";
+export { default as TypeList } from "./List/Type";

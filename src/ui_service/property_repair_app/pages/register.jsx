@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button, Loader, Message } from "@components/ui/common";
 import { toast } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
-import { register } from "@features/auth/authSlice";
+import { register, reset } from "@features/auth/authSlice";
 import { useRouter } from "next/router";
 
 export default function Register() {
@@ -30,7 +30,7 @@ export default function Register() {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const { user, isLoading, isError, isSuccess } = useSelector(
+  const { user, isLoading, isError, isSuccess, message } = useSelector(
     (state) => state.auth
   );
 

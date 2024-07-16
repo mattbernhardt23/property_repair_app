@@ -18,6 +18,10 @@ const VALUES = {
       title: "Cancelled",
       href: "/project/cancelled",
     },
+    {
+      title: "Schedule",
+      href: "/project/schedule",
+    },
   ],
   invoice: [
     {
@@ -51,13 +55,21 @@ const VALUES = {
   ],
 };
 
+const CLASS = {
+  project: "mr-64 ml-8 justify-between lg:mr-[50%]",
+  quote: "ml-32",
+  invoice: "ml-56",
+  payment: "ml-80",
+};
+
 export default function SubHeader({ value }) {
   let topic = VALUES[value];
+  let className = CLASS[value];
 
   return (
     <section className="bg-white text-black w-full relative font-header text-md">
-      <div className="flex justify-between py-2 mx-8">
-        <div className="flex flex-row justify-between">
+      <div className={`py-2`}>
+        <div className={`flex flex-row ${className}`}>
           {topic &&
             topic.map((t, index) => (
               <div key={index} className="px-4 hover:scale-110">

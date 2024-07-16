@@ -1,45 +1,52 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
-import { login, reset } from "@features/auth/authSlice";
-import { Button, Loader, Message } from "@components/ui/common";
+import { addProject, reset } from "@features/projects/projectSlice";
+import { Button, Loader } from "@components/ui/common";
+import { TechList, TypeList, StatusList } from "@components/ui/project";
 import { useRouter } from "next/router";
 
-export default function Add() {
-  const defaultState = {
-    tech_id: "",
-    address: "",
-    city: "",
-    state: "",
-    zip_code: "",
-    type: "",
-    tenant_name: "",
-    tenant_phone: "",
-    pm_name: "",
-    pm_phone: "",
-    description: "",
-  };
+const defaultState = {
+  tech_id: "",
+  address: "",
+  city: "",
+  state: "",
+  zip_code: "",
+  type: "",
+  tenant_name: "",
+  tenant_phone: "",
+  pm_name: "",
+  pm_phone: "",
+  instruction: "",
+};
 
+export default function Add() {
   const [formData, setFormData] = useState(defaultState);
+  const [selectedUser, setSelctedUser] = useState();
+  const [type, setType] = useState();
+  const [status, setStatus] = useState();
+
+  const { users } = useSelector((state) => state.auth);
 
   const {
-    tech_id,
     address,
     city,
     state,
     zip_code,
-    type,
     tenant_name,
     tenant_phone,
+    company,
     pm_name,
     pm_phone,
-    description,
+    instructions,
+    notes,
+    wo,
   } = formData;
 
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const { isLoading, message } = useSelector((state) => state.auth);
+  const { isLoading } = useSelector((state) => state.auth);
 
   const onChange = (e) => {
     setFormData((prevState) => ({
@@ -51,21 +58,25 @@ export default function Add() {
   const onClick = (e) => {
     e.preventDefault();
 
-    const userData = {
-      tech_id,
+    const projectData = {
+      tech_id: selectedUser,
       address,
       city,
       state,
       zip_code,
       type,
+      status,
       tenant_name,
       tenant_phone,
+      company,
       pm_name,
       pm_phone,
-      description,
+      instructions,
+      notes,
+      wo,
     };
 
-    dispatch(login(userData))
+    dispatch(addProject(projectData))
       .unwrap()
       .then(() => {
         router.push("/");
@@ -81,28 +92,16 @@ export default function Add() {
   return (
     <>
       <section>
-        <div className="flex flex-col items-center py-12 pt-28">
-          <h1 className="py-4 text-3xl font-header">Register</h1>
+        <div className="flex flex-col items-center py-12">
+          <h1 className="py-4 text-3xl font-header">New Project</h1>
           <p className="py-4 text-xl font-bold tracking-widest text-white">
             Welcome to Property Repair
           </p>
-          {/* <div className="w-1/3 pt-2">
-            <Message type="danger">{message}</Message>
-          </div> */}
         </div>
 
         <div className="flex flex-col items-center">
-          <div>
-            <input
-              type="text"
-              id="tech_id"
-              value={tech_id}
-              name="tech_id"
-              onChange={onChange}
-              placeholder="Tech ID"
-              required
-              className="w-96 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-4 sm:text-sm text-gray-800 border-gray-700 rounded-md"
-            />
+          <div className="w-96 py-2">
+            <TechList setSelctedUser={setSelctedUser} users={users} />
           </div>
           <div className="py-4">
             <input
@@ -113,7 +112,7 @@ export default function Add() {
               onChange={onChange}
               placeholder="Address"
               required
-              className="w-96 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-4 sm:text-sm text-gray-800 border-gray-700 rounded-md"
+              className="w-96 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-2 sm:text-sm text-gray-800 border-gray-700 rounded-md"
             />
           </div>
           <div className="py-4">
@@ -125,7 +124,7 @@ export default function Add() {
               onChange={onChange}
               placeholder="City"
               required
-              className="w-96 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-4 sm:text-sm text-gray-800 border-gray-700 rounded-md"
+              className="w-96 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-2 sm:text-sm text-gray-800 border-gray-700 rounded-md"
             />
           </div>
           <div className="py-4">
@@ -137,7 +136,7 @@ export default function Add() {
               onChange={onChange}
               placeholder="State"
               required
-              className="w-96 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-4 sm:text-sm text-gray-800 border-gray-700 rounded-md"
+              className="w-96 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-2 sm:text-sm text-gray-800 border-gray-700 rounded-md"
             />
           </div>
           <div className="py-4">
@@ -149,20 +148,14 @@ export default function Add() {
               onChange={onChange}
               placeholder="Zip Code"
               required
-              className="w-96 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-4 sm:text-sm text-gray-800 border-gray-700 rounded-md"
+              className="w-96 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-2 sm:text-sm text-gray-800 border-gray-700 rounded-md"
             />
           </div>
-          <div className="py-4">
-            <input
-              type="text"
-              id="type"
-              value={type}
-              name="type"
-              onChange={onChange}
-              placeholder="Type"
-              required
-              className="w-96 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-4 sm:text-sm text-gray-800 border-gray-700 rounded-md"
-            />
+          <div className="w-96 py-2">
+            <TypeList setType={setType} />
+          </div>
+          <div className="w-96 py-4">
+            <StatusList setStatus={setStatus} />
           </div>
           <div className="py-4">
             <input
@@ -173,7 +166,7 @@ export default function Add() {
               onChange={onChange}
               placeholder="Tenant Name"
               required
-              className="w-96 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-4 sm:text-sm text-gray-800 border-gray-700 rounded-md"
+              className="w-96 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-2 sm:text-sm text-gray-800 border-gray-700 rounded-md"
             />
           </div>
           <div className="py-4">
@@ -185,7 +178,19 @@ export default function Add() {
               onChange={onChange}
               placeholder="Tenant Phone"
               required
-              className="w-96 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-4 sm:text-sm text-gray-800 border-gray-700 rounded-md"
+              className="w-96 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-2 sm:text-sm text-gray-800 border-gray-700 rounded-md"
+            />
+          </div>
+          <div className="py-4">
+            <input
+              type="text"
+              id="company"
+              value={company}
+              name="company"
+              onChange={onChange}
+              placeholder="Company"
+              required
+              className="w-96 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-2 sm:text-sm text-gray-800 border-gray-700 rounded-md"
             />
           </div>
           <div className="py-4">
@@ -197,7 +202,7 @@ export default function Add() {
               onChange={onChange}
               placeholder="PM Name"
               required
-              className="w-96 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-4 sm:text-sm text-gray-800 border-gray-700 rounded-md"
+              className="w-96 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-2 sm:text-sm text-gray-800 border-gray-700 rounded-md"
             />
           </div>
           <div className="py-4">
@@ -209,19 +214,43 @@ export default function Add() {
               onChange={onChange}
               placeholder="PM Phone"
               required
-              className="w-96 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-4 sm:text-sm text-gray-800 border-gray-700 rounded-md"
+              className="w-96 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-2 sm:text-sm text-gray-800 border-gray-700 rounded-md"
             />
           </div>
           <div className="py-4">
             <input
               type="text"
-              id="description"
-              value={description}
-              name="description"
+              id="wo"
+              value={wo}
+              name="wo"
               onChange={onChange}
-              placeholder="Description"
+              placeholder="Work Order Number"
               required
-              className="w-96 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-4 sm:text-sm text-gray-800 border-gray-700 rounded-md"
+              className="w-96 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-2 sm:text-sm text-gray-800 border-gray-700 rounded-md"
+            />
+          </div>
+          <div className="py-4">
+            <textarea
+              type="text"
+              id="instructions"
+              value={instructions}
+              name="instructions"
+              onChange={onChange}
+              placeholder="Instructions"
+              required
+              className="w-96 h-32 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-2 sm:text-sm text-gray-800 border-gray-700 rounded-md"
+            />
+          </div>
+          <div className="py-4">
+            <textarea
+              type="text"
+              id="notes"
+              value={notes}
+              name="notes"
+              onChange={onChange}
+              placeholder="Notes"
+              required
+              className="w-96 h-32 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-2 sm:text-sm text-gray-800 border-gray-700 rounded-md"
             />
           </div>
         </div>

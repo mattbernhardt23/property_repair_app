@@ -24,8 +24,19 @@ export const getProject = createAsyncThunk(
   }
 );
 
+export const addProject = createAsyncThunk(
+  "project/add",
+  async (data, thunkAPI) => {
+    try {
+      return await projectService.addProject(data);
+    } catch (e) {
+      return thunkAPI.rejectWithValue(extractErrorMessage(e));
+    }
+  }
+);
+
 const initialState = {
-  project: null,
+  project: {},
   projects: [],
   isLoading: false,
   isError: false,
@@ -59,6 +70,17 @@ const projectDataSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(getProject.rejected, (state, action) => {
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(addProject.fulfilled, (state, action) => {
+        state.message = action.payload;
+        state.isLoading = false;
+      })
+      .addCase(addProject.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(addProject.rejected, (state, action) => {
         state.isError = true;
         state.message = action.payload;
       });

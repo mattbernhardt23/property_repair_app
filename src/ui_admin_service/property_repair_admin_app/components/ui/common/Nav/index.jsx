@@ -25,11 +25,6 @@ export default function Navbar() {
                   <a>Projects</a>
                 </Link>
               </div>
-              <div className="px-4 hover:scale-110">
-                <Link href="/schedule" legacyBehavior>
-                  <a>Schedule</a>
-                </Link>
-              </div>
               <div
                 className="px-4 hover:scale-110"
                 onMouseEnter={() => handleHover("quote")}

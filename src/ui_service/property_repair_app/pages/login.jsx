@@ -17,7 +17,7 @@ export default function Login() {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const { isLoading } = useSelector((state) => state.auth);
+  const { isLoading, Message } = useSelector((state) => state.auth);
 
   const onChange = (e) => {
     setFormData((prevState) => ({
@@ -61,9 +61,6 @@ export default function Login() {
           <p className="py-4 text-xl font-bold tracking-widest text-red-500">
             Please Login
           </p>
-          <div className="w-1/3">
-            <Message type="danger">{message}</Message>
-          </div>
         </div>
       </section>
       <section>

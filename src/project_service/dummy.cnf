@@ -1,0 +1,100 @@
+"""
+CREATE DATABASE projects;
+
+USE projects;
+
+CREATE TABLE projects (
+    project_id INT AUTO_INCREMENT PRIMARY KEY,
+    tech_id INT,
+    address VARCHAR(255),
+    city VARCHAR(255),
+    state VARCHAR(255),
+    zip_code VARCHAR(10),
+    longitude DECIMAL(10, 7),
+    latitude DECIMAL(10, 7),
+    distance DECIMAL(10, 2),
+    schedule_date DATE,
+    schedule_start_time TIME,
+    status ENUM('Open', 'Upcoming', 'Pending', 'Overdue', 'Invoiced', 'Completed', 'Paid'),
+    type ENUM('Carpentry', 'Electrical', 'Plumbing', 'Drywall', 'Turn', 'Fences/Deck'),
+    company VARCHAR(255),
+    tenant_name VARCHAR(255),
+    tenant_phone VARCHAR(15),
+    pm_name VARCHAR(255),
+    pm_phone VARCHAR(15),
+    instructions TEXT,
+    notes TEXT,
+    last_updated TIMESTAMP,
+    date_created TIMESTAMP
+    invoice_id INT,
+    invoice_status ENUM('Open', 'Submitted', 'Paid', 'Rejected') DEFAULT 'Open',
+    quote_id INT,
+    quote_status ENUM('Open', 'Submitted', 'Approved', 'Rejected') DEFAULT 'Open';
+);
+
+
+
+
+ALTER TABLE projects
+ADD COLUMN wo VARCHAR(255);
+
+
+quote button messages - "Submit Quote" , "View Submitted Quote", "Quote Approved", "Quote Rejected"
+invoice messages - "Submit Invoice", "View Invoice", "Invoice Pending Payment", "Invoice Paid", "Invoice Rejected"
+
+It looks like we are going to need to add status buttons to the above. We need to know if there is an invoice, or quote, 
+
+
+CREATE TABLE IF NOT EXISTS tenants (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    address VARCHAR(255),
+    project_id INT,
+    FOREIGN KEY (project_id) REFERENCES projects(project_id)
+);
+
+
+
+-- Create the invoice table
+CREATE TABLE invoices (
+    invoice_id INT AUTO_INCREMENT PRIMARY KEY,
+    invoice_date DATE,
+    date_created TIMESTAMP,
+    total_amount DECIMAL(10, 2),
+    status ENUM('Submitted', 'Pending', 'Paid', 'Rejected'),
+    project_id INT, 
+    FOREIGN KEY (project_id) REFERENCES projects(project_id)
+);
+
+-- Create the invoice_entry table
+CREATE TABLE invoice_entry (
+    entry_id INT AUTO_INCREMENT PRIMARY KEY,
+    invoice_id INT, 
+    entry_type ENUM('Labor', 'Materials Paid-By-Tech', 'Materials Paid-By-PR', 'Finance Charge', 'Estimate', 'Admin Fee')
+    entry_description TEXT,
+    entry_amount DECIMAL(10, 2),
+    FOREIGN KEY (invoice_id) REFERENCES invoices(invoice_id)
+);
+
+CREATE TABLE quotes (
+    quote_id INT AUTO_INCREMENT PRIMARY KEY,
+    quote_date DATE,
+    project_id INT, -- Foreign key linking to projects table
+    total_amount DECIMAL(10, 2),
+    status ENUM('Submitted', 'Accepted', 'Rejected', 'Expired', 'Pending'),
+    date_created TIMESTAMP,
+    FOREIGN KEY (project_id) REFERENCES projects(project_id)
+);
+
+CREATE TABLE quote_entry (
+    entry_id INT AUTO_INCREMENT PRIMARY KEY,
+    quote_id INT,
+    entry_type ENUM('Labor', 'Materials Paid-By-Tech', 'Materials Paid-By-PR', 'Finance Charge', 'Estimate', 'Admin Fee')
+    entry_description TEXT,
+    entry_amount DECIMAL(10, 2),
+    FOREIGN KEY (quote_id) REFERENCES quotes(quote_id)
+);
+
+
+"""

@@ -4,6 +4,7 @@ import authService from "./authService";
 
 const initialState = {
   user: null,
+  users: null,
   isError: false,
   isSuccess: false,
   isLoading: false,
@@ -53,6 +54,24 @@ export const getUser = createAsyncThunk("auth/getuser", async (_, thunkAPI) => {
     return thunkAPI.rejectWithValue(message);
   }
 });
+
+export const getActiveUsers = createAsyncThunk(
+  "auth/getactiveusers",
+  async (_, thunkAPI) => {
+    try {
+      return await authService.getActiveUsers();
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
 
 export const logout = createAsyncThunk("auth/logout", async () => {
   authService.logout();
@@ -115,6 +134,21 @@ export const authSlice = createSlice({
       .addCase(getUser.rejected, (state, action) => {
         state.isLoading = false;
         state.user = null;
+        state.isError = true;
+        // The thunkAPI.rejectwithvalue supplies the payload.
+        state.message = action.payload;
+      })
+      .addCase(getActiveUsers.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getActiveUsers.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.users = action.payload;
+      })
+      .addCase(getActiveUsers.rejected, (state, action) => {
+        state.isLoading = false;
+        state.users = null;
         state.isError = true;
         // The thunkAPI.rejectwithvalue supplies the payload.
         state.message = action.payload;

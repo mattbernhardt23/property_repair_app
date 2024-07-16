@@ -176,7 +176,28 @@ def get_users():
         cursor.close()
         conn.close()
 
-        return jsonify(active_users), 200
+        user_objects = []
+
+        for user in active_users:
+            user_object = {
+                "id": user[0],
+                "password": user[1],
+                "is_admin": user[2],
+                "phone_number": user[3],
+                "street_address": user[4],
+                "city": user[5],
+                "state": user[6],
+                "zip_code": user[7],
+                "email": user[8],
+                "latitude": user[9],
+                "longitude": user[10],
+                "first_name": user[11],
+                "last_name": user[12],
+            }
+
+            user_objects.append(user_object)
+
+        return jsonify(user_objects), 200
 
     except Exception as e:
         print(e)

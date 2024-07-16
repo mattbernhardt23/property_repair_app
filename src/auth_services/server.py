@@ -16,7 +16,8 @@ from flask_cors import CORS
 server = Flask(__name__)
 api = Api(server)
 # Allow requests from this origin
-CORS(server, origins=['http://localhost:3000', 'http://localhost:3001'])
+CORS(server, origins=['http://localhost:3000',
+     'http://localhost:3001', 'http://localhost:3002'])
 
 
 # tech user routes

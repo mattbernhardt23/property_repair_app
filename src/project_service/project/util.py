@@ -1,4 +1,5 @@
 import os
+import datetime
 import googlemaps
 import mysql.connector
 from flask import jsonify
@@ -35,12 +36,13 @@ def get_location(address):
 
     if geocode_result:
         location = geocode_result[0]['geometry']['location']
-        latitude = location['lat']
-        longitude = location['lng']
+        latitude = round(location['lat'], 8)
+        longitude = round(location['lng'], 8)
 
         return latitude, longitude
     else:
         print("No geocoding results found.")
+
 
 # Calculate Distance Between Tech and Project
 
@@ -69,6 +71,8 @@ def calculate_distance(destination, tech_id):
             distance_matrix = gmaps.distance_matrix(origin, destination)
             distance = distance_matrix['rows'][0]['elements'][0]['distance']['value']
 
+            print("origin", origin)
+            print("distance", distance)
             # Converts meters to miles
             distance = distance * 0.000621371
 
@@ -91,23 +95,28 @@ def calculate_distance(destination, tech_id):
 def add_project(request):
     data = request.json
 
+    # function to add data into the project database
+    # function to add tenant info into the tenant table
+    # function to add the pm info into the pm table
+
     # Extract data from the JSON
     address = data.get('address')
     city = data.get('city')
-    date_created = data.get('date_created')
-    invoice_id = data.get('invoice_id')
-    last_updated = data.get('last_updated')
-    pm_name = data.get('pm_name')
-    pm_phone = data.get('pm_phone')
-    project_id = data.get('project_id')
-    quote_id = data.get('quote_id')
     state = data.get('state')
+    zip_code = data.get('zip_code')
+    date_created = datetime.datetime.now()
+    last_updated = datetime.datetime.now()
     status = data.get('status')
-    tech_id = data.get('tech_id') or 12
+    tech_id = data.get('tech_id')
+    project_type = data.get('type')
+    company = data.get('company')
     tenant_name = data.get('tenant_name')
     tenant_phone = data.get('tenant_phone')
-    project_type = data.get('type')
-    zip_code = data.get('zip_code')
+    pm_name = data.get('pm_name')
+    pm_phone = data.get('pm_phone')
+    instructions = data.get('instructions')
+    notes = data.get('notes')
+    wo = data.get('wo')
 
     # Get Geo-Location of Project Address
     full_address = address + '' + city + ',' + state
@@ -116,7 +125,7 @@ def add_project(request):
     longitude = geo_locate[1]
 
     # Calculate Distance From Tech's Home
-    distance_from_home = calculate_distance(
+    distance = calculate_distance(
         destination=full_address, tech_id=tech_id)
 
     conn = mysql.connector.connect(**db_config)
@@ -125,18 +134,14 @@ def add_project(request):
     # Insert data into the database
     query = """
     INSERT INTO Projects (
-        address, city, date_created, distance_from_home, invoice_id,
-        last_updated, latitude, longitude, pm_name, pm_phone, project_id,
-        quote_id, state, status, tech_id, tenant_name, tenant_phone,
-        type, zip_code
+        address, city, state, zip_code, date_created, last_updated, status, tech_id, type, company, tenant_name, tenant_phone, pm_name, pm_phone, instructions, notes, latitude, longitude, distance, wo
+
     )
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    VALUES (%s, %s, %s, %s, %s, %s,
+     %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     values = (
-        address, city, date_created, distance_from_home, invoice_id,
-        last_updated, latitude, longitude, pm_name, pm_phone, project_id,
-        quote_id, state, status, tech_id, tenant_name, tenant_phone,
-        project_type, zip_code
+        address, city, state, zip_code, date_created, last_updated, status, tech_id, project_type, company, tenant_name, tenant_phone, pm_name, pm_phone, instructions, notes, latitude, longitude, distance, wo
     )
     cursor.execute(query, values)
 
@@ -156,7 +161,7 @@ def add_projects(request):
     # Prepare the query template for insertion
     query_template = """
     INSERT INTO Projects (
-        address, city, date_created, distance_from_home, invoice_id,
+        address, city, date_created, distance, invoice_id,
         last_updated, latitude, longitude, pm_name, pm_phone, project_id,
         quote_id, state, status, tech_id, tenant_name, tenant_phone,
         type, zip_code
@@ -172,15 +177,11 @@ def add_projects(request):
         date_created = project.get('date_created')
         invoice_id = project.get('invoice_id')
         last_updated = project.get('last_updated')
-        pm_name = project.get('pm_name')
-        pm_phone = project.get('pm_phone')
         project_id = project.get('project_id')
         quote_id = project.get('quote_id')
         state = project.get('state')
         status = project.get('status')
         tech_id = project.get('tech_id') or 12
-        tenant_name = project.get('tenant_name')
-        tenant_phone = project.get('tenant_phone')
         project_type = project.get('type')
         zip_code = project.get('zip_code')
 
@@ -191,14 +192,14 @@ def add_projects(request):
         longitude = geo_locate[1]
 
         # Calculate Distance From Tech's Home
-        distance_from_home = calculate_distance(
+        distance = calculate_distance(
             destination=full_address, tech_id=tech_id)
 
         # Insert data into the database
         values = (
-            address, city, date_created, distance_from_home, invoice_id,
-            last_updated, latitude, longitude, pm_name, pm_phone, project_id,
-            quote_id, state, status, tech_id, tenant_name, tenant_phone,
+            address, city, date_created, distance, invoice_id,
+            last_updated, latitude, longitude, project_id,
+            quote_id, state, status, tech_id,
             project_type, zip_code
         )
         cursor.execute(query_template, values)
@@ -218,17 +219,13 @@ def update_project(request):
     address = data.get('address')
     city = data.get('city')
     date_created = data.get('date_created')
-    distance_from_home = data.get('distance_from_home')
+    distance = data.get('distance_from_home')
     invoice_id = data.get('invoice_id')
     last_updated = data.get('last_updated')
-    pm_name = data.get('pm_name')
-    pm_phone = data.get('pm_phone')
     quote_id = data.get('quote_id')
     state = data.get('state')
     status = data.get('status')
     tech_id = data.get('tech_id')
-    tenant_name = data.get('tenant_name')
-    tenant_phone = data.get('tenant_phone')
     project_type = data.get('type')
     zip_code = data.get('zip_code')
 
@@ -238,16 +235,14 @@ def update_project(request):
     # Update data in the database
     query = """
     UPDATE Projects
-    SET address = %s, city = %s, date_created = %s, distance_from_home = %s,
-        invoice_id = %s, last_updated = %s, pm_name = %s, pm_phone = %s,
-        quote_id = %s, state = %s, status = %s, tech_id = %s, tenant_name = %s,
-        tenant_phone = %s, type = %s, zip_code = %s
+    SET address = %s, city = %s, date_created = %s, distance = %s,
+        invoice_id = %s, last_updated = %s,
+        quote_id = %s, state = %s, status = %s, tech_id = %s,  type = %s, zip_code = %s
     WHERE project_id = %s
     """
     values = (
-        address, city, date_created, distance_from_home, invoice_id,
-        last_updated, pm_name, pm_phone, quote_id, state, status, tech_id,
-        tenant_name, tenant_phone, project_type, zip_code, project_id
+        address, city, date_created, distance, invoice_id,
+        last_updated, quote_id, state, status, tech_id, project_type, zip_code, project_id
     )
     cursor.execute(query, values)
 

@@ -4,9 +4,10 @@ import { extractErrorMessage } from "@utils/extractErrorMessage";
 
 export const getProjects = createAsyncThunk(
   "projects/fetch",
-  async (thunkAPI) => {
+  async (data, thunkAPI) => {
     try {
-      return await projectService.getProjects();
+      console.log("in the slice");
+      return await projectService.getProjects(data);
     } catch (e) {
       return thunkAPI.rejectWithValue(extractErrorMessage(e));
     }

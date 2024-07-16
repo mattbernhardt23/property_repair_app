@@ -38,7 +38,7 @@ export default function List({ projects, children }) {
               .slice(-2)}`;
 
             return (
-              <Link href={`/project/${project.id}`} legacyBehavior>
+              <Link href={`/project/${project.project_id}`} legacyBehavior>
                 <tr
                   key={index}
                   className="border-t hover:bg-black hover:text-white cursor-pointer font-semibold"
@@ -47,7 +47,7 @@ export default function List({ projects, children }) {
                   <td className="py-2 px-4 text-center">{project.city}</td>
                   <td className="py-2 px-4 text-center">{project.state}</td>
                   <td className="py-2 px-4 text-center">
-                    {project.distance_from_home.toFixed(2)} mi
+                    {project.distance} mi
                   </td>
                   <td className="py-2 px-4 text-center">{project.type}</td>
                   <td className="py-2 px-4 text-center">{formattedSchedule}</td>

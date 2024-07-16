@@ -52,7 +52,7 @@ def create_user(data):
     first_name = data.get("first_name")
     last_name = data.get("last_name")
     password = data.get("password")
-    is_admin = int(data.get("is_admin"))
+    is_admin = int(data.get("is_admin", 0))
     email = data.get("email")
     phone_number = data.get("phone_number")
     street_address = data.get("street_address")
@@ -126,7 +126,7 @@ def createJWT(email, secret, authz):
 
 def validate(data):
     encoded_jwt = data.headers.get('Authorization')
-    print("jwt", encoded_jwt)
+
     if not encoded_jwt:
         return "Missing Credentials", 401
 

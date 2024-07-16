@@ -11,6 +11,8 @@ module.exports = {
     extend: {
       fontFamily: {
         header: ["Black Ops One"],
+        description: ["Roboto Mono"],
+        desc: ["Montserrat"],
       },
       flex: {
         2: "2 2 0%",

@@ -63,6 +63,12 @@ const getUser = async () => {
   }
 };
 
+const getActiveUsers = async () => {
+  const response = await axios.get(API_URL + "/users");
+
+  return response.data;
+};
+
 const logout = async () => {
   // Remove the "user" item from sessionStorage
   sessionStorage.removeItem("user");
@@ -75,6 +81,7 @@ const authService = {
   logout,
   login,
   getUser,
+  getActiveUsers,
 };
 
 export default authService;
